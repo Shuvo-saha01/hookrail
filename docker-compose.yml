@@ -1,0 +1,38 @@
+
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: hookrail
+      POSTGRES_PASSWORD: development
+      POSTGRES_DB: hookrail
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hookrail -d hookrail"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    working_dir: /app
+    command: air
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - .:/app
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgres://hookrail:development@db:5432/hookrail?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
