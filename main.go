@@ -1,20 +1,20 @@
 package main
 
 import (
-	"fmt"
+	"hookrail/db"
+	"hookrail/router"
 	"log"
 	"net/http"
 	"time"
 )
 
-func healthCheck(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Server is running")
-}
-
 func main() {
+	pool, err := db.ConnectToDb()
+	defer pool.Close()
+
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /", healthCheck)
+	router.HealthRouter(mux)
 
 	server := &http.Server{
 		Addr:         ":8080",
@@ -25,7 +25,7 @@ func main() {
 
 	log.Println("Server is running on localhost:8080")
 
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 
 	if err != nil {
 		log.Fatalf("Server failed to run %+v", err)
