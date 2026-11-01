@@ -4,13 +4,18 @@ WORKDIR /app
 
 RUN go install github.com/air-verse/air@latest
 
-COPY go.mod go.sum ./
-RUN go build
+
+
+COPY go.mod ./
 
 COPY . .
 
+RUN go build
+
+
+
 # Build step for production
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /myapp ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /myapp .
 # -------------------------------------------------------
 
 FROM alpine:3.21
