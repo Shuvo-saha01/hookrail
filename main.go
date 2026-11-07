@@ -9,8 +9,7 @@ import (
 )
 
 func main() {
-	pool, err := db.ConnectToDb()
-	defer pool.Close()
+	err := db.ConnectToDb()
 
 	mux := http.NewServeMux()
 
